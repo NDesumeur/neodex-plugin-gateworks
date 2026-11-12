@@ -1,0 +1,27 @@
+{
+  "id": "neodex.gateworks",
+  "name": "Gateworks",
+  "version": "1.0.0",
+  "author": "NDesumeur",
+  "description": "Construis des circuits logiques à la souris : interrupteurs, lampes, horloge et 7 portes (ET, OU, NON, OU exclusif, NON-ET, NON-OU, NON-OU exclusif), reliés par des fils qui s'allument quand le courant passe. La table de vérité se calcule toute seule, les bascules gardent leur mémoire, et 5 exemples montrent un demi-additionneur, un additionneur complet, une bascule RS, un multiplexeur et un clignotant.",
+  "icon": "icon.png",
+  "entry": "index.js",
+  "view": "gateworks",
+  "neobase": ">=4.0.0",
+  "type": "app",
+  "category": "Outils",
+  "mobile": true,
+  "compatibility": [
+    "windows",
+    "android",
+    "linux"
+  ],
+  "syncMode": "fusion",
+  "syncInfo": "Le circuit dessiné et la vitesse de l'horloge.",
+  "system": false,
+  "dependencies": {},
+  "sdk": "2.1.0",
+  "permissions": [
+    "storage"
+  ]
+}
