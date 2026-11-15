@@ -5,16 +5,16 @@ const CSS = `
 .gwBar .btn{min-width:0;width:auto;margin:0;padding:6px 10px}
 .gwBar .f{width:auto;flex:none;margin:0}
 .gwBar .hint{align-self:center}
-.gwGrid{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:14px}
+.gwGrid{display:grid;grid-template-columns:minmax(0,1fr) clamp(260px,21vw,380px);gap:14px}
 @media (max-width:900px){.gwGrid{grid-template-columns:minmax(0,1fr)}}
-.gwCan{width:100%;display:block;image-rendering:pixelated;background:#0b0816;border:2px solid var(--line);touch-action:none}
-.gwTable{font:13px monospace;border-collapse:collapse;width:100%}
-.gwTable td,.gwTable th{border:1px solid var(--line);padding:2px 6px;text-align:center}
+.gwCan{display:block;width:min(100%,calc(clamp(280px,calc(100vh - 290px),1000px) * 820 / 480));height:auto;aspect-ratio:820/480;margin:0 auto;image-rendering:pixelated;background:#0b0816;border:2px solid var(--line);touch-action:none}
+.gwTable{font:clamp(14px,1vw,17px) monospace;border-collapse:collapse;width:100%}
+.gwTable td,.gwTable th{border:1px solid var(--line);padding:4px 8px;text-align:center}
 .gwTable th{color:var(--lilac)}
 .gwTable td.on{color:#ffd34f}
 .gwTable tr.cur td{background:rgba(var(--pkr),.25)}
-.gwScroll{max-height:300px;overflow:auto;margin-top:6px}
-.gwHint{font-size:12px;color:var(--lilac);line-height:1.5;margin-top:8px}
+.gwScroll{max-height:clamp(260px,calc(100vh - 380px),640px);overflow:auto;margin-top:6px}
+.gwHint{font-size:14px;color:var(--lilac);line-height:1.5;margin-top:8px}
 `;
 // les types : nombre d'entrées, fonction, libellé
 const T = {
@@ -75,9 +75,9 @@ export default async function (ctx) {
   const save = () => { clearTimeout(saveT); saveT = setTimeout(() => ctx.folder.write('gateworks', {cs: cs.map(({id, t, x, y, label, v}) => ({id, t, x, y, label, v: t === 'IN' ? v : 0})), ws, hz: clockHz}).catch(() => {}), 400); };
   // ---------- l'interface ----------
   view.innerHTML = '';
-  const wrap = el('div', 'appWrap'), head = el('div', 'agHead'), bar = el('div', 'gwBar'), bar2 = el('div', 'gwBar'), lay = el('div', 'gwGrid'), main = el('div'), side = el('div', 'sysCard px');
+  const wrap = el('div', 'appWrap wide'), head = el('div', 'agHead'), bar = el('div', 'gwBar'), bar2 = el('div', 'gwBar'), lay = el('div', 'gwGrid'), main = el('div'), side = el('div', 'sysCard px');
   head.append(el('span', 'label', 'Gateworks · circuits logiques')); lay.append(main, side); wrap.append(head, bar, bar2, lay); view.append(wrap);
-  const can = el('canvas', 'gwCan'), g = can.getContext('2d'); can.width = 820; can.height = 480; can.id = 'gw_canvas';
+  const can = el('canvas', 'gwCan'), g = can.getContext('2d'); const LW = 820, LH = 480; can.width = LW; can.height = LH; can.id = 'gw_canvas';  // LW × LH : la grille ; la toile est dessinée plus fine si elle est affichée plus grande
   const hint = el('p', 'gwHint', 'Choisis une pièce puis clique sur la grille pour la poser. Glisse une pièce pour la déplacer, glisse d\'une sortie (à droite) vers une entrée (à gauche) pour la relier. Clic sur un interrupteur : l\'allumer. Clic droit ou Suppr : enlever une pièce ou un fil.');
   main.append(can, hint);
   let tool = null;
@@ -94,14 +94,15 @@ export default async function (ctx) {
   // ---------- le dessin ----------
   const ON = '#ffd34f', OFF = '#3a2f5a';
   function draw() {
-    g.fillStyle = '#0b0816'; g.fillRect(0, 0, can.width, can.height);
-    g.fillStyle = '#1a1430'; for (let x = 0; x < can.width; x += 20) for (let y = 0; y < can.height; y += 20) g.fillRect(x, y, 2, 2);
+    const k = Math.max(1, Math.min(3, Math.round(can.clientWidth * devicePixelRatio / LW * 2) / 2)); if (can.width !== LW * k) { can.width = LW * k; can.height = LH * k; } g.setTransform(k, 0, 0, k, 0, 0);
+    g.fillStyle = '#0b0816'; g.fillRect(0, 0, LW, LH);
+    g.fillStyle = '#1a1430'; for (let x = 0; x < LW; x += 20) for (let y = 0; y < LH; y += 20) g.fillRect(x, y, 2, 2);
     const by = new Map(cs.map(c => [c.id, c]));
     g.lineWidth = 3;
     for (const w of ws) { const a = by.get(w.from), b = by.get(w.to); if (!a || !b) continue; const [x1, y1] = pinOut(a), [x2, y2] = pinIn(b, w.pin), mx = Math.round((x1 + x2) / 2);
       g.strokeStyle = a.v ? ON : OFF; g.beginPath(); g.moveTo(x1, y1); g.lineTo(mx, y1); g.lineTo(mx, y2); g.lineTo(x2, y2); g.stroke(); }
     if (wiring) { g.strokeStyle = '#ff4fb0'; g.setLineDash([4, 4]); g.beginPath(); const [x1, y1] = pinOut(wiring.c); g.moveTo(x1, y1); g.lineTo(wiring.x, wiring.y); g.stroke(); g.setLineDash([]); }
-    g.font = 'bold 12px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = 'bold 14px monospace'; g.textAlign = 'center'; g.textBaseline = 'middle';
     for (const c of cs) {
       const [w, h] = SIZE(c.t), sel = c === hover;
       if (c.t === 'OUT') { g.fillStyle = c.v ? ON : '#2a2244'; g.fillRect(c.x + 4, c.y + 4, w - 8, h - 8); g.strokeStyle = sel ? '#ff4fb0' : '#8a7aa8'; g.lineWidth = 2; g.strokeRect(c.x + 4, c.y + 4, w - 8, h - 8); if (c.v) { g.fillStyle = '#fff6c0'; g.fillRect(c.x + 10, c.y + 10, 6, 6); } }
@@ -110,7 +111,7 @@ export default async function (ctx) {
       g.fillStyle = '#8a7aa8';
       for (let i = 0; i < T[c.t][0]; i++) { const [px, py] = pinIn(c, i); g.fillRect(px - 4, py - 2, 5, 5); }
       if (c.t !== 'OUT') { const [px, py] = pinOut(c); g.fillStyle = c.v ? ON : '#8a7aa8'; g.fillRect(px - 1, py - 3, 6, 6); }
-      if (c.label) { g.fillStyle = '#c8b8f0'; g.font = '11px monospace'; g.fillText(c.label, c.x + w / 2, c.y - 8); g.font = 'bold 12px monospace'; }
+      if (c.label) { g.fillStyle = '#c8b8f0'; g.font = '13px monospace'; g.fillText(c.label, c.x + w / 2, c.y - 8); g.font = 'bold 14px monospace'; }
     }
     if (tool && ghost) { const [w, h] = SIZE(tool); g.strokeStyle = '#ff4fb0'; g.lineWidth = 1; g.setLineDash([3, 3]); g.strokeRect(ghost[0], ghost[1], w, h); g.setLineDash([]); }
   }
@@ -126,7 +127,7 @@ export default async function (ctx) {
   }
   function refresh() { const ok = settle(cs, ws); status.replaceChildren(el('span', '', ok ? 'Circuit stable.' : 'Le circuit oscille (une boucle sans fin) : la table l\'indique par ~.'), el('br'), cs.length + ' ', el('span', '', cs.length > 1 ? 'pièces' : 'pièce'), ', ' + ws.length + ' ', el('span', '', ws.length > 1 ? 'fils' : 'fil')); drawTable(); draw(); }
   // ---------- la souris ----------
-  const pos = e => { const r = can.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * can.width, (e.clientY - r.top) / r.height * can.height]; };
+  const pos = e => { const r = can.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * LW, (e.clientY - r.top) / r.height * LH]; };
   const hit = (x, y) => { for (let i = cs.length - 1; i >= 0; i--) { const c = cs[i], [w, h] = SIZE(c.t); if (x >= c.x - 6 && x <= c.x + w + 6 && y >= c.y && y <= c.y + h) return c; } return null; };
   const nearOut = (x, y) => cs.find(c => c.t !== 'OUT' && Math.hypot(x - pinOut(c)[0], y - pinOut(c)[1]) < 9);
   const nearIn = (x, y) => { for (const c of cs) for (let i = 0; i < T[c.t][0]; i++) { const [px, py] = pinIn(c, i); if (Math.hypot(x - px, y - py) < 10) return [c, i]; } return null; };
@@ -141,12 +142,12 @@ export default async function (ctx) {
     const c = hit(x, y);
     if (c && !tool) { drag = {c, dx: x - c.x, dy: y - c.y}; return; }
     if (tool) { const [w, h] = SIZE(tool), t = tool, n = cs.filter(k => k.t === t).length;
-      cs.push({id: nid++, t, x: Math.max(0, Math.min(can.width - w, snap(x - w / 2))), y: Math.max(20, Math.min(can.height - h, snap(y - h / 2))), label: t === 'IN' ? String.fromCharCode(65 + n % 26) : t === 'OUT' ? 'L' + (n + 1) : t === 'CLK' ? 'H' + (n + 1) : '', v: 0}); save(); refresh(); }
+      cs.push({id: nid++, t, x: Math.max(0, Math.min(LW - w, snap(x - w / 2))), y: Math.max(20, Math.min(LH - h, snap(y - h / 2))), label: t === 'IN' ? String.fromCharCode(65 + n % 26) : t === 'OUT' ? 'L' + (n + 1) : t === 'CLK' ? 'H' + (n + 1) : '', v: 0}); save(); refresh(); }
   };
   can.onpointermove = e => {
     const [x, y] = pos(e);
     if (wiring) { wiring.x = x; wiring.y = y; draw(); return; }
-    if (drag) { moved = true; const [w, h] = SIZE(drag.c.t); drag.c.x = Math.max(0, Math.min(can.width - w, snap(x - drag.dx))); drag.c.y = Math.max(20, Math.min(can.height - h, snap(y - drag.dy))); draw(); return; }
+    if (drag) { moved = true; const [w, h] = SIZE(drag.c.t); drag.c.x = Math.max(0, Math.min(LW - w, snap(x - drag.dx))); drag.c.y = Math.max(20, Math.min(LH - h, snap(y - drag.dy))); draw(); return; }
     const hv = hit(x, y); ghost = tool ? (() => { const [w, h] = SIZE(tool); return [snap(x - w / 2), snap(y - h / 2)]; })() : null;
     if (hv !== hover || tool) { hover = hv; draw(); }
     can.style.cursor = nearOut(x, y) && !tool ? 'crosshair' : '';

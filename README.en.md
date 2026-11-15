@@ -29,3 +29,7 @@ Half adder, full adder, SR latch, multiplexer and blinker (with the clock).
 ## Data
 
 The circuit and the clock speed are kept in the plugin folder. Permission: `storage` only.
+
+## Screen size (1.0.1)
+
+The circuit uses the available space (window height, full width on a large screen) without stretching, and it is drawn at screen resolution: gates and labels stay sharp. The truth table and explanations are larger.

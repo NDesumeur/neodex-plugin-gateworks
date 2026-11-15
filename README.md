@@ -29,3 +29,7 @@ Demi-additionneur, additionneur complet, bascule RS, multiplexeur et clignotant 
 ## Données
 
 Le circuit et la vitesse de l'horloge sont gardés dans le dossier du plugin. Autorisation : `storage` seulement.
+
+## Taille de l’écran (1.0.1)
+
+Le circuit prend la place disponible (hauteur de la fenêtre, toute la largeur sur un grand écran) sans se déformer, et il est dessiné à la résolution de l’écran : les portes et leurs étiquettes restent nettes. La table de vérité et les explications sont plus grandes.
