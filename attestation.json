@@ -1,9 +1,9 @@
 {
   "pluginId": "neodex.gateworks",
   "repo": "NDesumeur/neodex-plugin-gateworks",
-  "version": "1.0.0",
-  "sha256": "8416f49a42a32eaa8d4278b468366e19e116c4ac6a5809af607e07b731645082",
-  "approvedAt": "2026-11-12T06:35:37.982Z",
+  "version": "1.0.1",
+  "sha256": "a9a2aca95cd44dde85fadba322ef3617484e1abf2d408ae43c9409b08b3f2e06",
+  "approvedAt": "2026-11-16T04:14:36.232Z",
   "neobase": ">=4.0.0",
-  "signature": "BYAJLv1Ej8oJGBCLtKE9jGWoalcGN8RzvuSIXhw7ca72Y6bLmqQL0xsggxFggJj+CatvKEbw+WezOy9KAGlvDA=="
+  "signature": "ShAFGQhdstAuVhIBhcaHcNxoFSu1jBy+4Tuy6E+vmbGgiUqZCWrF9nks/NCpw2okPsa+I/xshdZ3HW4scJvwCw=="
 }
