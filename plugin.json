@@ -1,9 +1,9 @@
 {
   "id": "neodex.gateworks",
   "name": "Gateworks",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "author": "NDesumeur",
-  "description": "Construis des circuits logiques à la souris : interrupteurs, lampes, horloge et 7 portes (ET, OU, NON, OU exclusif, NON-ET, NON-OU, NON-OU exclusif), reliés par des fils qui s'allument quand le courant passe. La table de vérité se calcule toute seule, les bascules gardent leur mémoire, et 5 exemples montrent un demi-additionneur, un additionneur complet, une bascule RS, un multiplexeur et un clignotant. S'adapte à la taille de l'écran : le circuit prend la hauteur de la fenêtre et reste net, étiquettes et table de vérité plus grandes.",
+  "description": "Construis des circuits logiques à la souris, et suis le parcours « de la porte au processeur » : 11 niveaux qui partent de la seule porte NON-ET et vont jusqu'à un petit processeur, chaque niveau réussi devenant une puce réutilisable. Dans l'atelier libre : interrupteurs, lampes, horloge, 7 portes et tes propres puces, des fils qui s'allument quand le courant passe, la table de vérité calculée toute seule, et 5 exemples (additionneurs, bascule, multiplexeur, clignotant).",
   "icon": "icon.png",
   "entry": "index.js",
   "view": "gateworks",
